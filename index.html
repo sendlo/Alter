@@ -5,7 +5,8 @@
 	<meta name="Author" content="Mike Sendlakowski">
 	<link href="src/reset.css" type="text/css" rel="stylesheet">
 	<link href="src/main.css" type="text/css" rel="stylesheet">
-	<script src="src/main.js" type="text/javascript"></script>
+	<script src="src/zepto.js" type="text/javascript"></script>
+	<script src="src/glfx.js" type="text/javascript"></script>
 
 </head>
 <body>
@@ -34,30 +35,18 @@
 	<div class="rgt">
 		<div class="filterSetList">
 			<div class="ttl">PUBLIC FILTERS</div>
-			<div class="filterPics">
-				<div class="filterPic"></div>
-				<div class="filterPic"></div>
-				<div class="filterPic"></div>
-				<div class="filterPic"></div>
-				<div class="filterPic"></div>
-				<div class="filterPic"></div>
-			</div>
+			<div class="filterPics publicFilters"></div>
 		</div>
 		<div class="filterSetList">
 			<div class="ttl">PRIVATE FILTERS</div>
-			<div class="filterPics">
-				<div class="filterPic"></div>
-				<div class="filterPic"></div>
-				<div class="filterPic"></div>
-				<div class="filterPic"></div>
-				<div class="filterPic"></div>
-				<div class="filterPic"></div>
-			</div>
+			<div class="filterPics privateFilters"></div>
 		</div>
 		<video id='v' style="position:absolute;visibility:hidden"></video>
-		<canvas id='c'></canvas>
+
 	</div>
 </div>
+
+<script src="src/main2.js" type="text/javascript"></script>
 
 </body>
 </html>
