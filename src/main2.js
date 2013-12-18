@@ -72,6 +72,55 @@ $(".activeFilter").on("change", "input", function(){
 	saveFilterParamVal($(this));
 });
 
+$(".save").on("click", function(){
+	saveAsPrivate();
+});
+
+$(".privateFilters").on("click", ".saveF", function(){
+	saveAsPublic($(this));
+	return false;
+}); 
+
+$(".morph").on("click", function(){
+	var a = [
+		{name:"Hue / Saturation", p:[0.8, 0.8], api:"hueSaturation"},
+		{name:"Swirl", p:[500,500,250,-3], api:"swirl"}
+	];
+	var b = [
+		{name:"Hue / Saturation", p:[0.1, 0.1]},
+		{name:"Swirl", p:[100,100,50,-3]}
+	]
+	morph(a,b,5000);
+});
+
+
+
+function saveAsPublic(box){
+	console.log(mydata(box.parent(), "fs"));
+	return false;
+}
+
+function saveAsPrivate() {
+	var newFilterSet = [],
+		filter;
+	for(var i=0,j=currentFilterSet.length;i<j;i++) {
+		filter = currentFilterSet[i];
+		newFilterSet.push({
+			name: filter.name,
+			p: filter.p
+		});
+	}
+
+	var filterPic = $("<div class='filterPic'></div>");
+	mydata(filterPic, "fs", {set:newFilterSet});
+	$(".privateFilters").append(filterPic);
+
+	loadSmallCanvas(filterPic, document.getElementById('v'));
+
+	filterPic.append("<div class='saveF'></div>");
+}
+
+
 function saveFilterParamVal(fld) {
 	var set = fld.data("set") || 0,
 		num = fld.data("num") || 0,
@@ -177,21 +226,19 @@ function playVideo(stream) {
 	   setInterval(function() {
 		  if (v.paused || v.ended) return;
 	        texture.loadContentsOf(v);
+/*
 			if(currentFilterSet !== oldFilter) {
 				console.log("FilterSet change:");
 				console.log(currentFilterSet);
 				oldFilter = currentFilterSet;
 			}
-	       	applyFilterSet(c.draw(texture), currentFilterSet).update();
+*/
+			applyFilterSet(c.draw(texture), currentFilterSet).update();
 	   }, 33);
 
 		setTimeout(function(){
 			$(".filterPic").each(function(){
-				try {
-					loadSmallCanvas($(this), v);
-				}catch(e) {
-					console.log("Error loading small canvas: " + e);
-				}
+				loadSmallCanvas($(this), v);
 			});			
 		}, 100);
 
@@ -201,22 +248,24 @@ function playVideo(stream) {
 }
 
 function loadSmallCanvas(box, vid) {
-	var c = fx.canvas();
-	var texture = c.texture(v);
-	texture.loadContentsOf(v);
-	var filterSet = buildFilterSet(mydata(box,"fs"));
-	for(var i=0,j=filterSet.length;i<j;i++) {
-		filterSet[i].api = getApiName(filterSet[i].name);
-	}
-	applyFilterSet(c.draw(texture), filterSet).update();
+	try {
+		var c = fx.canvas();
+		var texture = c.texture(v);
+		texture.loadContentsOf(v);
+		var filterSet = buildFilterSet(mydata(box,"fs"));
+		for(var i=0,j=filterSet.length;i<j;i++) {
+			filterSet[i].api = getApiName(filterSet[i].name);
+		}
+		applyFilterSet(c.draw(texture), filterSet).update();
 
-	var img = new Image();
-	console.log(box.width());
-	console.log(box.height());
-	img.setAttribute("width", box.width());
-	img.setAttribute("height", box.height());
-	img.src = c.toDataURL('image/png');
-	box.append(img);
+		var img = new Image();
+		img.setAttribute("width", box.width());
+		img.setAttribute("height", box.height());
+		img.src = c.toDataURL('image/png');
+		box.append(img);
+	}catch(e) {
+		console.log("Error loading small canvas: " + e);
+	}	
 }
 
 function applyFilterSet(c, filterSet) {
@@ -323,6 +372,74 @@ function mydata(obj, name, val){
 	}	
 }
 
+function supports_html5_storage() {
+  try {
+    return 'localStorage' in window && window['localStorage'] !== null;
+  } catch (e) {
+    return false;
+  }
+}
+
+function morph(a,b,ms){
+	
+	var paramDiffs = [],
+		runs = ms/33,
+		i, j, x, y,
+		filterSet,
+		timer,
+		diffCount;
+
+	currentFilterSet = a;
+
+	morphNormalize(a,b);
+
+	for(i=0,j=a.length;i<j;i++) {
+		filterSet = a[i]
+		for(x=0,y=a[i].p.length;x<y;x++){
+			paramDiffs.push(((b[i].p[x] - a[i].p[x])/runs).toFixed(5));
+		}
+	}
+	
+	timer = setInterval(function() {
+
+		diffCount = 0;
+
+		if(runs < 0) {
+			currentFilterSet = b;
+			console.log(currentFilterSet);
+			clearInterval(timer);
+		}
+
+		runs--;
+
+		for(i=0,j=a.length;i<j;i++) {
+			for(x=0,y=a[i].p.length;x<y;x++){
+				currentFilterSet[i].p[x] += paramDiffs[diffCount]-0;
+				diffCount++;
+			}
+		}
+
+	}, 33);
+
+}
+
+// Normalize the filterSets so they can morph smoothly 
+function morphNormalize(a,b) {
+
+	var filterSet, 
+		i, j;
+
+	for(i=0,j=a.length;i<j;i++) {
+				
+		
+
+
+	}
+
+}
+
+
+
 storedFilterSets.push({set:[
 	{name:"Swirl", p:[500,150,200,-1]},
 	{name:"Ink", p:[0.1]}
@@ -370,6 +487,6 @@ storedFilterSets.push({set:[
 
 
 loadFilters($(".publicFilters"));
-loadFilters($(".privateFilters"));
+//loadFilters($(".privateFilters"));
 requestVideo();	
 

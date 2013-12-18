@@ -41,6 +41,7 @@ a.btn {
 
 .filterSetList {
 	margin-bottom: 10px; 
+	height: 82px;
 }
 .filterSetList .ttl {
 	color: white;
@@ -54,6 +55,7 @@ a.btn {
 	width: 75px;
 	height: 50px;
 	border: 1px solid white;
+	position: relative;
 }
 #c {
 	border: 1px solid white;
@@ -85,4 +87,17 @@ a.activeFilterLink {
 }
 .filterparams input {
 	width: 60%;
+}
+
+.saveF {
+	display: none;
+	width: 25px;
+	height: 25px;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	background: url(save.png) no-repeat 0 0 white;
+}
+.filterPic:hover .saveF {
+	display: block;
 }
